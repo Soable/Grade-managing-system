@@ -37,6 +37,7 @@ def register():
     if request.method == 'POST':
         user_name = request.form.get('username')
         pass_word = request.form.get('password')
+        pass_word_verify = request.form.get('password_verify')
 
         if not user_name or not pass_word:
             return "Vui lòng nhập đủ thông tin!"
@@ -44,6 +45,8 @@ def register():
         existing_user = User.query.filter_by(username=user_name).first()
         if existing_user:
             return "Tài khoản đã tồn tại!"
+        if not pass_word_verify == pass_word:
+            return redirect(url_for('register'))
 
         new_user = User(username=user_name, password=pass_word, role='teacher')
         db.session.add(new_user)
