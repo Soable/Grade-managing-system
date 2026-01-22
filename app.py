@@ -5,7 +5,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///quanly.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-#
+##
 
 # Model cơ sở dữ liệu
 class User(db.Model):
@@ -40,11 +40,12 @@ def register():
         pass_word_verify = request.form.get('password_verify')
 
         if not user_name or not pass_word:
+            redirect(url_for('register'))
             return "Vui lòng nhập đủ thông tin!"
 
         existing_user = User.query.filter_by(username=user_name).first()
         if existing_user:
-            return "Tài khoản đã tồn tại!"
+            return redirect(url_for('register'))
         if not pass_word_verify == pass_word:
             return redirect(url_for('register'))
 
