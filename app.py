@@ -1,35 +1,40 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
-from models import db, User
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+from models import db, User, Student
 import os
 
-# --- IMPORT CÁC BLUEPRINT ---
+# import blueprints
 from routes_hs import hs_bp
 from routes_gvcn import gvcn_bp
 from routes_gvbm import gvbm_bp
 
-# Khởi tạo Flask với cấu hình instance_relative_config để trỏ vào thư mục instance
 app = Flask(__name__, instance_relative_config=True)
 
-# --- CẤU HÌNH ỨNG DỤNG ---
-# Sử dụng sqlite:///quanly.db kết hợp với instance_relative_config=True 
-# sẽ giúp Flask tự tìm database trong folder /instance/
+# --- CẤU HÌNH ---
+# Database nằm trong thư mục /instance/quanly.db
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///quanly.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'du-an-quan-ly-diem-2026' # Dùng để bảo mật session/flash
+app.config['SECRET_KEY'] = 'khoa-bi-mat-cho-session-2026' 
 
-# --- KHỞI TẠO DATABASE ---
+# initialise db
 db.init_app(app)
 
-# --- ĐĂNG KÝ CÁC BLUEPRINT ---
-# Lưu ý: tên blueprint phải khớp với file lẻ (vd: hs, gvcn, gvbm)
 app.register_blueprint(hs_bp)
 app.register_blueprint(gvcn_bp)
 app.register_blueprint(gvbm_bp)
 
-# --- ROUTES HỆ THỐNG ---
-
 @app.route('/')
 def index():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    role = session.get('role')
+    if role == 'student':
+        return redirect(url_for('hs.dashboard'))
+    elif role == 'gvcn':
+        return redirect(url_for('gvcn.dashboard'))
+    elif role == 'gvbm':
+        return redirect(url_for('gvbm.input_grades'))
+    
     return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -38,17 +43,17 @@ def login():
     if request.method == 'POST':
         user_name = request.form.get('username')
         pass_word = request.form.get('password')
-        role = request.form.get('role')
+        role = request.form.get('role') 
 
-        # Tìm người dùng khớp cả username, password và role
-        user = User.query.filter_by(
-            username=user_name,
-            password=pass_word,
-            role=role
-        ).first()
+        # find user
+        user = User.query.filter_by(username=user_name, role=role).first()
 
-        if user:
-            # Điều hướng dựa trên role của User
+        if user and user.check_password(pass_word):
+            session['user_id'] = user.id
+            session['role'] = user.role
+            session['username'] = user.username
+            
+            #redirecting
             if user.role == 'student':
                 return redirect(url_for('hs.dashboard'))
             elif user.role == 'gvcn':
@@ -60,44 +65,35 @@ def login():
 
     return render_template('login.html', error=error)
 
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     error = None
     if request.method == 'POST':
         user_name = request.form.get('username')
         pass_word = request.form.get('password')
-        pass_word_verify = request.form.get('password_verify')
-        role = request.form.get('role') # Lấy từ thẻ <select> trong HTML
+        role = request.form.get('role')
 
-        # Các bước kiểm tra logic
-        if not user_name or not pass_word or not role:
-            error = "Vui lòng nhập đủ thông tin và chọn vai trò!"
-        elif User.query.filter_by(username=user_name).first():
+        if User.query.filter_by(username=user_name).first():
             error = "Tài khoản đã tồn tại!"
-        elif len(pass_word) < 6:
-            error = "Mật khẩu phải có ít nhất 6 ký tự!"
-        elif pass_word != pass_word_verify:
-            error = "Mật khẩu xác nhận không khớp!"
         else:
-            try:
-                # Tạo user mới và lưu vào DB
-                new_user = User(username=user_name, password=pass_word, role=role)
-                db.session.add(new_user)
-                db.session.commit()
-                return redirect(url_for('login'))
-            except Exception as e:
-                db.session.rollback()
-                error = f"Lỗi cơ sở dữ liệu: {str(e)}"
-
+            new_user = User(username=user_name, role=role)
+            new_user.set_password(pass_word) # encoding password
+            db.session.add(new_user)
+            db.session.commit()
+            return redirect(url_for('login'))
+    
     return render_template('register.html', error=error)
 
-# --- KHỞI CHẠY ---
 if __name__ == '__main__':
     with app.app_context():
-        # Tạo folder instance nếu chưa có để chứa database
+        # create instance if not created
         if not os.path.exists(app.instance_path):
             os.makedirs(app.instance_path)
-        # Tạo các bảng dựa trên models.py
-        db.create_all() 
+        db.create_all()
         
     app.run(host='127.0.0.1', port=5005, debug=True)
