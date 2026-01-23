@@ -16,7 +16,7 @@ class User(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-class Classroom(db.Model):
+class Classroom(db.Model): 
     id = db.Column(db.Integer, primary_key=True)
     class_name = db.Column(db.String(50), nullable=False)
     class_code = db.Column(db.String(4), unique=True, nullable=False) #each class has 1 4-digit code
