@@ -14,5 +14,8 @@
             <button type="submit">Đăng ký</button>
         </form>
     </body>
+    {% if error %}
+    <p style="color:red">{{ error }}</p>
+    {% endif %}
 </html>
 

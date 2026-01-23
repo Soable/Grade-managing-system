@@ -5,7 +5,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///quanly.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-##
+#
 
 # Model cơ sở dữ liệu
 class User(db.Model):
@@ -17,37 +17,54 @@ class User(db.Model):
 # --- ROUTE ĐĂNG NHẬP ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+
+    error = None
+
     if request.method == 'POST':
         user_name = request.form.get('username')
         pass_word = request.form.get('password')
-    
-        # Kiểm tra xem có user nào khớp cả user_name và pass_word không
-        user = User.query.filter_by(username=user_name, password=pass_word).first()
+        role = request.form.get('role')
+
+        user = User.query.filter_by(
+            username=user_name,
+            password=pass_word,
+            role=role
+        ).first()
 
         if user:
-            return f"Đăng nhập thành công! Chào {user.username} (Vai trò: {user.role})"
+            return f"Đăng nhập thành công! ({user.role})"
         else:
-            return "Sai tên đăng nhập hoặc mật khẩu!"
+            error = "Sai tên đăng nhập, mật khẩu!"
 
-    return render_template('login.html')
+    return render_template('login.html', error=error)
 
 # --- ROUTE ĐĂNG KÝ ---
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+
+    error = None
+
     if request.method == 'POST':
         user_name = request.form.get('username')
         pass_word = request.form.get('password')
         pass_word_verify = request.form.get('password_verify')
 
         if not user_name or not pass_word:
-            redirect(url_for('register'))
-            return "Vui lòng nhập đủ thông tin!"
-
+            error = "Vui lòng nhập đủ thông tin!"
+            return render_template('register.html', error=error)
         existing_user = User.query.filter_by(username=user_name).first()
+
         if existing_user:
-            return redirect(url_for('register'))
+            error = "Tài khoản đã tồn tại!"
+            return render_template('register.html', error=error)
+        
+        if len(pass_word) < 8:
+            error = "Mật khẩu phải ít nhất 8 kí tự"
+            return render_template('register.html', error=error)
+
         if not pass_word_verify == pass_word:
-            return redirect(url_for('register'))
+            error = "Xác nhận lại mật khẩu!"
+            return render_template('register.html', error=error)
 
         new_user = User(username=user_name, password=pass_word, role='teacher')
         db.session.add(new_user)
@@ -55,9 +72,9 @@ def register():
 
         return redirect(url_for('login'))
     
-    return render_template('register.html')
+    return render_template('register.html', error=error)
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all() 
-    app.run(host='0.0.0.0', port=5002, debug=True)
+    app.run(host='127.0.0.1', port=5005, debug=True)
