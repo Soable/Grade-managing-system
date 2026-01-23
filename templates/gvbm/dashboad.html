@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GVBM - Nhập điểm</title>
+    <style>
+        body { font-family: sans-serif; margin: 40px; }
+        .input-group { margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <h2>Trang nhập điểm dành cho GVBM</h2>
+    
+    <div style="background-color: #f9f9f9; padding: 20px;">
+        <h3>Tìm lớp học</h3>
+        <form action="/gvbm/input" method="POST">
+            <input type="text" name="class_code" placeholder="Nhập mã lớp 4 ký tự" maxlength="4" required>
+            <button type="submit">Tìm lớp</button>
+        </form>
+    </div>
+
+    <p><i>Lưu ý: Bạn chỉ có thể chỉnh sửa điểm thuộc môn học mình phụ trách.</i></p>
+
+    <a href="/login">Đăng xuất</a>
+</body>
+</html>

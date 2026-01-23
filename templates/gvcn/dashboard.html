@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GVCN - Quản lý lớp</title>
+    <style>
+        body { font-family: sans-serif; margin: 40px; }
+        .box { border: 1px solid #ccc; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <h2>Trang quản lý dành cho GVCN</h2>
+    
+    <div class="box">
+        <h3>Tạo lớp học mới</h3>
+        <form action="/gvcn/create_class" method="POST">
+            <input type="text" name="class_name" placeholder="Tên lớp (vd: 12A1)" required>
+            <button type="submit">Tạo lớp & Lấy mã</button>
+        </form>
+    </div>
+
+    <div class="box">
+        <h3>Upload danh sách lớp (.csv)</h3>
+        <form action="/gvcn/upload_csv" method="POST" enctype="multipart/form-data">
+            <input type="file" name="file" accept=".csv" required>
+            <button type="submit">Tải lên danh sách</button>
+        </form>
+    </div>
+
+    <a href="/login">Đăng xuất</a>
+</body>
+</html>
