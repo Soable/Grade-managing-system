@@ -31,6 +31,15 @@ app.register_blueprint(gvbm_bp)
 @app.route('/')
 def index():
     return redirect(url_for('login'))
+db = SQLAlchemy(app)
+#
+# BENNGO TEST PUSH
+# Model cơ sở dữ liệu
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(100), nullable=False)
+    role = db.Column(db.String(20), nullable=False)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
