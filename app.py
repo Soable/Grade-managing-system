@@ -6,7 +6,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///quanly.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 #
-
+# BENNGO TEST PUSH
 # Model cơ sở dữ liệu
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
