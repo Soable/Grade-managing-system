@@ -1,37 +1,38 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Học sinh - Xem điểm</title>
-    <style>
-        body { font-family: sans-serif; margin: 40px; }
-        table { width: 50%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
-        th { background-color: #4CAF50; color: white; }
-    </style>
-</head>
-<body>
-    <h2>Bảng điểm của bạn</h2>
-    
-    <table>
-        <tr>
-            <th>Môn học</th>
-            <th>Điểm số</th>
-        </tr>
-        <tr>
-            <td>Toán học</td>
-            <td><strong>{{ grade.math }}</strong></td>
-        </tr>
-        <tr>
-            <td>Ngữ văn</td>
-            <td><strong>{{ grade.literature }}</strong></td>
-        </tr>
-        <tr>
-            <td>Tiếng Anh</td>
-            <td><strong>{{ grade.english }}</strong></td>
-        </tr>
-    </table>
+<h2>Bảng điểm của {{ student.name }}</h2>
 
-    <br>
-    <a href="/login">Đăng xuất</a>
-</body>
-</html>
+<table>
+    <tr>
+        <th>Môn học</th>
+        <th>Điểm</th>
+    </tr>
+    <tr>
+        <td>Toán</td>
+        <td>
+            {% if grade and grade.math is not none %}
+                {{ grade.math }}
+            {% else %}
+                <i>Chưa có dữ liệu</i>
+            {% endif %}
+        </td>
+    </tr>
+    <tr>
+        <td>Ngữ văn</td>
+        <td>
+            {% if grade and grade.literature is not none %}
+                {{ grade.literature }}
+            {% else %}
+                <i>Chưa có dữ liệu</i>
+            {% endif %}
+        </td>
+    </tr>
+    <tr>
+        <td>Tiếng Anh</td>
+        <td>
+            {% if grade and grade.english is not none %}
+                {{ grade.english }}
+            {% else %}
+                <i>Chưa có dữ liệu</i>
+            {% endif %}
+        </td>
+    </tr>
+</table>
