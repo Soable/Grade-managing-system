@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Chi tiết lớp học</title>
+</head>
+<body>
+    <a href="{{ url_for('gvcn.dashboard') }}"> << Quay lại Dashboard</a>
+    <hr>
+
+    <h1>Tên lớp: {{ classroom.class_name }}</h1>
+    <h3>Mã lớp: {{ classroom.class_code }}</h3>
+    <hr>
+
+    <h3>Thêm học sinh mới</h3>
+    <form method="POST">
+        <input type="hidden" name="manual_add" value="1">
+        
+        <label>MSHS:</label>
+        <input type="text" name="mshs" required> <label>Họ tên:</label>
+        <input type="text" name="name" required>
+        
+        <button type="submit">Lưu học sinh</button>
+
+        
+    </form>
+    <h3>Hoặc tải lên file CSV</h3>
+        <form method="POST" enctype="multipart/form-data"> <input type="hidden" name="upload_csv" value="1">
+        <input type="file" name="file" accept=".csv" required>
+        <button type="submit">Tải lên</button>
+    </form>
+
+    <hr>
+
+    <h3>Danh sách học sinh</h3>
+    <table border="1" cellpadding="5" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>MSHS</th> <th>Họ Tên</th>
+                <th>Toán</th>
+                <th>Văn</th>
+                <th>Anh</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in students %}
+            <tr>
+                <td>{{ s.mshs }}</td> <td>{{ s.name }}</td>
+                <td>{{ s.grade.math if s.grade and s.grade.math is not none else '-' }}</td>
+                <td>{{ s.grade.literature if s.grade and s.grade.literature is not none else '-' }}</td>
+                <td>{{ s.grade.english if s.grade and s.grade.english is not none else '-' }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" style="text-align: center;">Chưa có học sinh nào</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

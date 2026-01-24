@@ -9,7 +9,6 @@ def dashboard():
         return redirect(url_for('login'))
     
     student = Student.query.filter_by(user_id=session['user_id']).first()
-    
     grade = student.grade  # có thể là None
 
     return render_template(

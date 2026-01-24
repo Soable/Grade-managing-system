@@ -1,31 +1,37 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>GVCN - Quản lý lớp</title>
-    <style>
-        body { font-family: sans-serif; margin: 40px; }
-        .box { border: 1px solid #ccc; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-    </style>
-</head>
+<head><title>Dashboard GVCN</title></head>
 <body>
-    <h2>Trang quản lý dành cho GVCN</h2>
+    <h1>Xin chào GVCN! Danh sách lớp của bạn</h1>
+    <a href="{{ url_for('logout') }}">Đăng xuất</a>
     
-    <div class="box">
-        <h3>Tạo lớp học mới</h3>
-        <form action="/gvcn/create_class" method="POST">
-            <input type="text" name="class_name" placeholder="Tên lớp (vd: 12A1)" required>
-            <button type="submit">Tạo lớp & Lấy mã</button>
+    <div style="border: 1px solid #ccc; padding: 10px; margin: 20px 0;">
+        <h3>Tạo lớp mới</h3>
+        <form action="{{ url_for('gvcn.create_class') }}" method="POST">
+            <input type="text" name="class_name" placeholder="Tên lớp (VD: 12A1)" required>
+            <button type="submit">Tạo & Vào quản lý</button>
         </form>
     </div>
 
-    <div class="box">
-        <h3>Upload danh sách lớp (.csv)</h3>
-        <form action="/gvcn/upload_csv" method="POST" enctype="multipart/form-data">
-            <input type="file" name="file" accept=".csv" required>
-            <button type="submit">Tải lên danh sách</button>
-        </form>
-    </div>
-
-    <a href="/login">Đăng xuất</a>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Tên lớp</th>
+                <th>Mã Code (Gửi cho GVBM)</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in classes %}
+            <tr>
+                <td>{{ c.class_name }}</td>
+                <td><b>{{ c.class_code }}</b></td>
+                <td>
+                    <a href="{{ url_for('gvcn.class_detail', class_id=c.id) }}">Vào quản lý danh sách</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </body>
 </html>
