@@ -19,7 +19,13 @@ def dashboard():
     teacher_id = session['user_id']
     my_classes = Classroom.query.filter_by(gvcn_id=teacher_id).all()
     
-    return render_template('gvcn/dashboard.html', classes=my_classes)
+    class_ids = [c.id for c in my_classes]
+    if class_ids:
+        all_students = Student.query.filter(Student.class_id.in_(class_ids)).all()
+    else:
+        all_students = []
+    
+    return render_template('gvcn/dashboard.html', classes=my_classes, all_students=all_students)
 
 @gvcn_bp.route('/gvcn/create_class', methods=['POST'])
 def create_class():
@@ -55,12 +61,17 @@ def class_detail(class_id):
             #format: mshs - name || mshs - middle name - name
 
             if file and file.filename.endswith('.csv'):
-                stream = io.TextIOWrapper(file.stream._file, "utf-8")
+                stream = io.TextIOWrapper(file.stream, encoding="utf-8")
                 csv_reader = csv.reader(stream)
+                
+                next(csv_reader, None)
                 
                 for row in csv_reader:
                     if not row: continue 
                     h_mshs = row[0].strip()
+                    
+                    if h_mshs.lower() == 'mshs': continue
+
                     h_ten = ""
 
                     if format_type == '1':
@@ -78,10 +89,13 @@ def class_detail(class_id):
                     if not existed_student:
                         # new user
                         u = User(username=h_mshs, role='student')
-                        u.set_password('123456')
+                        
+                        u.set_password('123456') 
+                        
                         db.session.add(u)
                         db.session.flush()
 
+                        # new student
                         s = Student(mshs=h_mshs, name=h_ten, user_id=u.id, class_id=current_class.id)
                         db.session.add(s)
                         db.session.flush()
@@ -103,7 +117,10 @@ def class_detail(class_id):
             else:
                 # new student ACCOUNT
                 u = User(username=mshs, role='student')
+                
+                # set password
                 u.set_password('123456')
+                
                 db.session.add(u)
                 db.session.flush()
 
@@ -119,6 +136,34 @@ def class_detail(class_id):
                 flash("Đã thêm học sinh thành công!")
 
         return redirect(url_for('gvcn.class_detail', class_id=class_id))
-
+    
     students = Student.query.filter_by(class_id=class_id).all()
     return render_template('gvcn/class_detail.html', classroom=current_class, students=students)
+
+
+@gvcn_bp.route('/gvcn/change_password/<int:student_id>', methods=['GET', 'POST'])
+def change_password(student_id):
+    if 'user_id' not in session or session.get('role') != 'gvcn':
+        return redirect(url_for('login'))
+
+    student = Student.query.get_or_404(student_id)
+    
+    # check if the student is in the class
+    teacher_id = session['user_id']
+    classroom = Classroom.query.filter_by(gvcn_id=teacher_id, id=student.class_id).first()
+    
+    if not classroom:
+        flash("Không có quyền truy cập!")
+        return redirect(url_for('gvcn.dashboard'))
+    
+    if request.method == 'POST':
+        if student.user:
+            student.user.set_password('123456')
+            db.session.commit()
+            flash("Đã reset mật khẩu thành công!")
+        else:
+            flash("Lỗi: Học sinh chưa có user!")
+            
+        return redirect(url_for('gvcn.class_detail', class_id=student.class_id))
+    
+    return render_template('gvcn/change_password.html', student=student)

@@ -11,7 +11,7 @@ from routes_gvbm import gvbm_bp
 app = Flask(__name__, instance_relative_config=True)
 
 # --- CẤU HÌNH ---
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///quanly.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'khoa-bi-mat-cho-session-2026' 
 
@@ -96,7 +96,7 @@ def register():
         if User.query.filter_by(username=user_name).first():
             error = "Tài khoản đã tồn tại!"
         else:
-            new_user = User(j=user_name, role=role)
+            new_user = User(username=user_name, role=role)
             new_user.set_password(pass_word)
             db.session.add(new_user)
             db.session.commit()

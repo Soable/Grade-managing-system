@@ -17,15 +17,30 @@
         <input type="hidden" name="manual_add" value="1">
         
         <label>MSHS:</label>
-        <input type="text" name="mshs" required> <label>Họ tên:</label>
+        <input type="text" name="mshs" required> 
+        
+        <label>Họ tên:</label>
         <input type="text" name="name" required>
         
         <button type="submit">Lưu học sinh</button>
-
-        
     </form>
+
     <h3>Hoặc tải lên file CSV</h3>
-        <form method="POST" enctype="multipart/form-data"> <input type="hidden" name="upload_csv" value="1">
+    <form method="POST" enctype="multipart/form-data"> 
+        <input type="hidden" name="upload_csv" value="1">
+        
+        <p>Chọn định dạng file:</p>
+        <label>
+            <input type="radio" name="format_type" value="1" checked> 
+            Format 1 (Cột A: MSHS, Cột B: Họ Tên)
+        </label>
+        <br>
+        <label>
+            <input type="radio" name="format_type" value="2"> 
+            Format 2 (Cột A: MSHS, Cột B: Họ Lót, Cột C: Tên)
+        </label>
+        <br><br>
+
         <input type="file" name="file" accept=".csv" required>
         <button type="submit">Tải lên</button>
     </form>
@@ -36,23 +51,41 @@
     <table border="1" cellpadding="5" cellspacing="0" width="100%">
         <thead>
             <tr>
-                <th>MSHS</th> <th>Họ Tên</th>
-                <th>Toán</th>
+                <th>MSHS</th> 
+                <th>Họ Tên</th>
+                <th>Mật khẩu</th> <th>Toán</th>
                 <th>Văn</th>
                 <th>Anh</th>
+                <th>Thao tác</th>
             </tr>
         </thead>
         <tbody>
             {% for s in students %}
             <tr>
-                <td>{{ s.mshs }}</td> <td>{{ s.name }}</td>
+                <td>{{ s.mshs }}</td> 
+                <td>{{ s.name }}</td>
+                
+                <td style="color: grey; font-style: italic; text-align: center;">
+                    123456
+                </td>
+
                 <td>{{ s.grade.math if s.grade and s.grade.math is not none else '-' }}</td>
                 <td>{{ s.grade.literature if s.grade and s.grade.literature is not none else '-' }}</td>
                 <td>{{ s.grade.english if s.grade and s.grade.english is not none else '-' }}</td>
+                
+                <td style="text-align: center;">
+                    <form method="POST" action="{{ url_for('gvcn.change_password', student_id=s.id) }}" 
+                          onsubmit="return confirm('Reset mật khẩu về 123456?');" 
+                          style="display: inline;">
+                        <button type="submit" style="cursor: pointer; color: red;">
+                            Reset Pass
+                        </button>
+                    </form>
+                </td>
             </tr>
             {% else %}
             <tr>
-                <td colspan="5" style="text-align: center;">Chưa có học sinh nào</td>
+                <td colspan="7" style="text-align: center;">Chưa có học sinh nào</td>
             </tr>
             {% endfor %}
         </tbody>
