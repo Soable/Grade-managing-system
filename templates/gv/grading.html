@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nhập điểm</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f6f8; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; margin-bottom: 20px; }
+        h1 { margin: 0; font-size: 22px; color: #2c3e50; }
+        .back-btn { text-decoration: none; color: #555; background: #eee; padding: 8px 16px; border-radius: 20px; font-size: 14px; transition: 0.2s; }
+        .back-btn:hover { background: #ddd; }
+        
+        table { width: 100%; border-collapse: collapse; }
+        thead { background-color: #4a90e2; color: white; }
+        th { padding: 12px 5px; font-size: 14px; text-align: center; border: 1px solid #357abd; }
+        td { padding: 8px 5px; border: 1px solid #eee; text-align: center; }
+        
+        tr:nth-child(even) { background-color: #fcfcfc; }
+        tr:hover { background-color: #f1f8ff; }
+        
+        input[type="number"] {
+            width: 100%;
+            padding: 8px 4px;
+            border: 1px solid transparent;
+            background: #fff;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 15px;
+            box-sizing: border-box;
+            transition: 0.2s;
+        }
+        input[type="number"]:focus {
+            border: 1px solid #4a90e2;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+            outline: none;
+        }
+        /* Style for read-only calculated fields */
+        td.avg-score { font-weight: bold; color: #2c3e50; background-color: #f2f2f2; }
+        
+        .save-bar {
+            margin-top: 20px;
+            text-align: right;
+            position: sticky;
+            bottom: 20px;
+        }
+        .save-btn {
+            background-color: #2ecc71;
+            color: white;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 30px;
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.4);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .save-btn:hover { transform: scale(1.05); background-color: #27ae60; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Sổ điểm môn {{ subject }} - Lớp {{ classroom.class_name }}</h1>
+            <a href="{{ url_for('gv.dashboard') }}" class="back-btn">← Quay lại</a>
+        </div>
+        
+        <form method="POST">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="5%">STT</th>
+                        <th width="20%">Tên Học Sinh</th>
+                        <th colspan="4">Thường xuyên (Hệ 1)</th>
+                        <th>Giữa Kỳ (Hệ 2)</th>
+                        <th>Cuối Kỳ (Hệ 3)</th>
+                        <th width="8%">ĐTB</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in students %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td style="text-align: left; padding-left: 10px;">
+                            <div style="font-weight: 500;">{{ s.name }}</div>
+                            <div style="font-size: 12px; color: #888;">{{ s.mshs }}</div>
+                        </td>
+                        <td><input type="number" step="0.1" name="tx1_{{s.id}}" value="{{ get_score(s.grade, 'tx1') }}" placeholder="-"></td>
+                        <td><input type="number" step="0.1" name="tx2_{{s.id}}" value="{{ get_score(s.grade, 'tx2') }}" placeholder="-"></td>
+                        <td><input type="number" step="0.1" name="tx3_{{s.id}}" value="{{ get_score(s.grade, 'tx3') }}" placeholder="-"></td>
+                        <td><input type="number" step="0.1" name="tx4_{{s.id}}" value="{{ get_score(s.grade, 'tx4') }}" placeholder="-"></td>
+                        
+                        <td style="background: #fffbeb"><input type="number" step="0.1" style="font-weight:bold" name="gk_{{s.id}}" value="{{ get_score(s.grade, 'gk') }}" placeholder="-"></td>
+                        <td style="background: #fff0f0"><input type="number" step="0.1" style="font-weight:bold; color: #e74c3c" name="ck_{{s.id}}" value="{{ get_score(s.grade, 'ck') }}" placeholder="-"></td>
+                        
+                        <td class="avg-score">
+                            {{ get_score(s.grade, 'avg') }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <div class="save-bar">
+                <button type="submit" class="save-btn">💾 LƯU ĐIỂM SỐ</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Chi tiết lớp học</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f8f9fa; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .back-link { color: #666; text-decoration: none; display: flex; align-items: center; gap: 5px; }
+        .back-link:hover { color: #333; }
+        
+        .info-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .grid-forms { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+        @media (max-width: 768px) { .grid-forms { grid-template-columns: 1fr; } }
+        
+        h1, h3 { margin-top: 0; color: #333; }
+        input[type="text"], input[type="file"] { width: 100%; padding: 10px; margin: 5px 0 15px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { background: #4a90e2; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+        button:hover { background: #357abd; }
+        
+        /* Table Styles */
+        .table-wrapper { overflow-x: auto; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        th { background-color: #4a90e2; color: white; padding: 12px; font-weight: 500; font-size: 14px; }
+        td { padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; text-align: center; }
+        td:nth-child(2) { text-align: left; font-weight: 500; } /* Cột Tên */
+        tr:nth-child(even) { background-color: #f8f9fa; }
+        tr:hover { background-color: #f1f1f1; }
+        
+        .reset-btn { background: none; border: 1px solid #e74c3c; color: #e74c3c; padding: 5px 10px; font-size: 12px; border-radius: 4px; }
+        .reset-btn:hover { background: #e74c3c; color: white; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>Lớp: {{ classroom.class_name }}</h1>
+            <span style="color: #666;">Mã lớp: <b>{{ classroom.class_code }}</b></span>
+        </div>
+        <a href="{{ url_for('gv.dashboard') }}" class="back-link">« Quay lại Dashboard</a>
+    </div>
+
+    <div class="grid-forms">
+        <div class="info-card">
+            <h3>Thêm học sinh thủ công</h3>
+            <form method="POST">
+                <input type="hidden" name="manual_add" value="1">
+                <label>MSHS:</label>
+                <input type="text" name="mshs" required placeholder="Ví dụ: HS001"> 
+                
+                <label>Họ tên:</label>
+                <input type="text" name="name" required placeholder="Nguyễn Văn A">
+                
+                <button type="submit">Lưu học sinh</button>
+            </form>
+        </div>
+
+        <div class="info-card">
+            <h3>Tải lên danh sách (CSV)</h3>
+            <form method="POST" enctype="multipart/form-data"> 
+                <input type="hidden" name="upload_csv" value="1">
+                
+                <p style="margin: 0 0 10px; font-size: 14px; color: #555;">Chọn định dạng file:</p>
+                <div style="margin-bottom: 10px;">
+                    <label style="display:block; margin-bottom:5px; cursor:pointer;">
+                        <input type="radio" name="format_type" value="1" checked> Format 1 (Cột A: MSHS, Cột B: Họ Tên)
+                    </label>
+                    <label style="display:block; cursor:pointer;">
+                        <input type="radio" name="format_type" value="2"> Format 2 (Cột A: MSHS, Cột B: Họ Lót, Cột C: Tên)
+                    </label>
+                </div>
+
+                <input type="file" name="file" accept=".csv" required>
+                <button type="submit" style="background: #27ae60;">Tải lên CSV</button>
+            </form>
+        </div>
+    </div>
+
+    <h3>Danh sách & Điểm tổng kết</h3>
+    <div class="table-wrapper">
+        <table border="0">
+            <thead>
+                <tr>
+                    <th>MSHS</th> 
+                    <th>Họ Tên</th>
+                    <th>Toán</th><th>Văn</th><th>Anh</th><th>Lý</th><th>Hóa</th><th>Sinh</th>
+                    <th>Tin</th><th>Sử</th><th>Địa</th><th>KTPL</th><th>CN</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in students %}
+                <tr>
+                    <td>{{ s.mshs }}</td> 
+                    <td>{{ s.name }}</td>
+                    
+                    <td>{{ s.grade.math_avg if s.grade and s.grade.math_avg is not none else '-' }}</td>
+                    <td>{{ s.grade.lit_avg if s.grade and s.grade.lit_avg is not none else '-' }}</td>
+                    <td>{{ s.grade.eng_avg if s.grade and s.grade.eng_avg is not none else '-' }}</td>
+                    <td>{{ s.grade.phy_avg if s.grade and s.grade.phy_avg is not none else '-' }}</td>
+                    <td>{{ s.grade.chem_avg if s.grade and s.grade.chem_avg is not none else '-' }}</td>
+                    <td>{{ s.grade.bio_avg if s.grade and s.grade.bio_avg is not none else '-' }}</td>
+                    <td>{{ s.grade.inf_avg if s.grade and s.grade.inf_avg is not none else '-' }}</td>
+                    <td>{{ s.grade.his_avg if s.grade and s.grade.his_avg is not none else '-' }}</td>
+                    <td>{{ s.grade.geo_avg if s.grade and s.grade.geo_avg is not none else '-' }}</td>
+                    <td>{{ s.grade.civ_avg if s.grade and s.grade.civ_avg is not none else '-' }}</td>
+                    <td>{{ s.grade.it_avg if s.grade and s.grade.it_avg is not none else '-' }}</td>
+                    <td>{{ s.grade.tech_avg if s.grade and s.grade.tech_avg is not none else '-' }}</td>
+                    
+                    <td>
+                        <form method="POST" action="{{ url_for('gv.change_password', student_id=s.id) }}" 
+                            onsubmit="return confirm('Reset mật khẩu về 123456?');">
+                            <button type="submit" class="reset-btn">Reset Pass</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="14" style="padding: 20px; color: #888;">Chưa có học sinh nào trong lớp.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
