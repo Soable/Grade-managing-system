@@ -1,21 +1,21 @@
-# Trình quản lí điêm số cho trường học
+# Trình quản lí điểm số cho trường học
 
 Đây là hệ thống đơn giản để giáo viên và học sinh lưu trữ, quản lí kết quả học tập ở trường, được thiết kế cụ thể cho học sinh Việt Nam.
 
 ## Tính năng
 
 ### Quản lí người dùng
-* Đăng nhập, đăng kí, phân quyền (học sinh / giáo viên), hash password
+* Đăng nhập, đăng kí, phân quyền (học sinh / giáo viên); hash, đổi mật khẩu.
 
 ### Quản lí điểm số 
-* Với học sinh: xem điểm tất cả các cột, điểm trung bình môn, GPA 
-* Với giáo viên: điều chỉnh điểm số **của môn mình dạy** cho từng học sinh 
+* Với học sinh: xem điểm tất cả các cột, điểm trung bình môn, GPA.
+* Với giáo viên: điều chỉnh điểm số **của môn mình dạy** cho từng học sinh.
 
 ### Quản lí lớp học (riêng cho giáo viên)
 * Thêm lớp chủ nhiệm, thêm từng học sinh, thêm bằng file .csv
-* Lọc ra các học sinh đã thêm rồi, sort danh sách học sinh
-* Xem điểm trung bình môn của học sinh
-* Tham gia lớp giảng dạy bằng code
+* Lọc ra các học sinh đã thêm rồi, sort danh sách học sinh.
+* Xem điểm trung bình môn của học sinh.
+* Tham gia lớp giảng dạy bằng code.
 
 
 
@@ -64,3 +64,7 @@ pip install -r requirements.txt
 python app.py
 # then open http://localhost:5005
 ```
+
+## Demo
+Video chạy thử:
+https://bit.ly/project_demovideo
