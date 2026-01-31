@@ -59,6 +59,7 @@
     <div class="register-container">
         <h2>Tạo tài khoản giáo viên</h2>
         <form action="/register" method="POST">
+            <input type="text" class="form-control" id="full_name" name="full_name" placeholder="Họ tên" required>
             <input type="text" name="username" placeholder="Tên tài khoản" required>
             <input type="password" name="password" placeholder="Mật khẩu" required>
             <input type="password" name="password_verify" placeholder="Nhập lại mật khẩu" required>
@@ -72,7 +73,7 @@
                 <option value="bio">Sinh Học</option>
                 <option value="inf">Tin học</option>
                 <option value="hist">Lịch Sử</option>
-                <option value="geo">Địa Lý</option>
+                <option value="geo">Địa Lý</option> 
                 <option value="civic">Giáo dục KT & PL</option>
                 <option value="tech">Công Nghệ</option>
             </select>

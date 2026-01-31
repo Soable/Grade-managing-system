@@ -14,6 +14,7 @@
         
         .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; }
         
+        /* Forms */
         .inline-form { display: flex; gap: 10px; }
         input[type="text"] { flex-grow: 1; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
         button { padding: 10px 20px; background: #4a90e2; color: white; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; white-space: nowrap; }
@@ -87,7 +88,13 @@
                 {% for c in teaching_classes %}
                 <tr>
                     <td>{{ c.class_name }}</td>
-                    <td>{{ c.gv.username if c.gv else 'N/A' }}</td>
+                    <td>
+                        {% if c.teacher %}
+                            {{ c.teacher.full_name if c.teacher.full_name else c.teacher.username }}
+                        {% else %}
+                            <span style="color: red;">N/A</span>
+                        {% endif %}
+                    </td>
                     <td style="text-align: right;">
                         <a href="{{ url_for('gv.grading', class_id=c.id) }}">Vào Sổ Điểm &rarr;</a>
                     </td>

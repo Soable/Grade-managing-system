@@ -1,5 +1,5 @@
-from flask import Blueprint, render_template, session, redirect, url_for
-from models import Student
+from flask import Blueprint, render_template, session, redirect, url_for, request, flash
+from models import db, User, Student, Classroom, Grade
 
 hs_bp = Blueprint('hs', __name__)
 

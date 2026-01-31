@@ -72,28 +72,6 @@
         <form action="/login" method="POST">
             <input type="text" name="username" placeholder="Tên tài khoản" required>
             <input type="password" name ="password" placeholder="Mật khẩu" required>
-            
-            <select name="role" id="role" onchange="checkRole()" required>
-                <option value="" disabled selected>-- Bạn là ai? --</option>
-                <option value="student">Học sinh</option>
-                <option value="teacher">Giáo viên</option>
-            </select>
-
-            <select name="subject" id="subject" style="display: none;">
-                <option value="" disabled selected>-- Chọn môn giảng dạy --</option>
-                <option value="toan">Toán</option>
-                <option value="van">Ngữ Văn</option>
-                <option value="anh">Tiếng Anh</option>
-                <option value="ly">Vật Lý</option>
-                <option value="hoa">Hóa Học</option>
-                <option value="sinh">Sinh Học</option>
-                <option value="tin">Tin học</option>
-                <option value="su">Lịch Sử</option>
-                <option value="dia">Địa Lý</option>
-                <option value="ktpl">Giáo dục KT & PL</option>
-                <option value="cnghe">Công Nghệ</option>
-            </select>
-
             <button type="submit">Đăng nhập</button>
         </form>
 

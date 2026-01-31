@@ -140,16 +140,16 @@ def grading(class_id):
     
     subject_map = {
         'Toan': 'math', 'Toán': 'math', 'math': 'math',
-        'Van': 'lit',   'Văn': 'lit',   'lit': 'lit',
-        'Anh': 'eng',   'eng': 'eng',
-        'Ly': 'phy',    'Lý': 'phy',    'phy': 'phy',
-        'Hoa': 'chem',  'Hóa': 'chem',  'chem': 'chem',
-        'Sinh': 'bio',  'bio': 'bio',
-        'Tin': 'inf',   'inf': 'inf',
-        'Su': 'hist',   'Sử': 'hist',   'hist': 'hist',
-        'Dia': 'geo',   'Địa': 'geo',   'geo': 'geo',
-        'GDCD': 'civic', 'civic': 'civic',
-        'CongNghe': 'tech', 'CN': 'tech', 'tech': 'tech'
+        'Van': 'lit',   'Văn': 'lit',   'lit': 'lit', 'Literature': 'lit',
+        'Anh': 'eng',   'eng': 'eng',   'English': 'eng',
+        'Ly': 'phy',    'Lý': 'phy',    'phy': 'phy', 'Physics': 'phy',
+        'Hoa': 'chem',  'Hóa': 'chem',  'chem': 'chem', 'Chemistry': 'chem',
+        'Sinh': 'bio',  'bio': 'bio',   'Biology': 'bio',
+        'Tin': 'inf',   'inf': 'inf',   'Informatics': 'inf',
+        'Su': 'hist',   'Sử': 'hist',   'hist': 'hist', 'History': 'hist',
+        'Dia': 'geo',   'Địa': 'geo',   'geo': 'geo',   'Geography': 'geo',
+        'GDCD': 'civic', 'civic': 'civic', 'ktpl': 'civic',
+        'CongNghe': 'tech', 'CN': 'tech', 'tech': 'tech', 'Technology': 'tech'
     }
 
     display_name_map = {
@@ -160,18 +160,81 @@ def grading(class_id):
     }
     
     prefix = subject_map.get(user.subject)
-    subject_name_vn = display_name_map.get(prefix, user.subject)
-
+    
     if not prefix:
-        flash(f"Lỗi: Môn '{user.subject}' không hợp lệ.")
+        flash(f"Lỗi: Tài khoản của bạn (môn '{user.subject}') chưa được cấu hình để nhập điểm.", "error")
         return redirect(url_for('gv.dashboard'))
 
+    subj_name = display_name_map.get(prefix, user.subject)
     students = Student.query.filter_by(class_id=class_id).order_by(Student.mshs).all()
+
+    if request.method == 'POST':
+        count_updated = 0
+        for s in students:
+            if not s.grade:
+                s.grade = Grade(student_id=s.id)
+                db.session.add(s.grade)
+            
+            score_cols = ['tx1', 'tx2', 'tx3', 'tx4', 'gk', 'ck']
+            
+            for col in score_cols:
+                input_name = f"{col}_{s.id}"
+                raw_val = request.form.get(input_name)
+                
+                db_field = f"{prefix}_{col}"
+                
+                if raw_val and raw_val.strip() != '':
+                    try:
+                        val = float(raw_val)
+                        if 0 <= val <= 10:
+                            setattr(s.grade, db_field, val)
+                    except ValueError:
+                        continue
+                else:
+                    setattr(s.grade, db_field, None)
+            try:
+                tx_values = []
+                for i in range(1, 5):
+                    val = getattr(s.grade, f"{prefix}_tx{i}")
+                    if val is not None: tx_values.append(val)
+                
+                gk_val = getattr(s.grade, f"{prefix}_gk")
+                ck_val = getattr(s.grade, f"{prefix}_ck")
+                
+                total_point = sum(tx_values)
+                total_coeff = len(tx_values)
+                
+                if gk_val is not None:
+                    total_point += gk_val * 2
+                    total_coeff += 2
+                    
+                if ck_val is not None:
+                    total_point += ck_val * 3
+                    total_coeff += 3
+                
+                avg_field = f"{prefix}_avg"
+                if total_coeff > 0:
+                    avg_val = round(total_point / total_coeff, 1)
+                    setattr(s.grade, avg_field, avg_val)
+                else:
+                    setattr(s.grade, avg_field, None)
+                    
+                count_updated += 1
+                
+            except Exception as e:
+                print(f"Error calculating avg for student {s.id}: {e}")
+
+        db.session.commit()
+        flash(f"Đã lưu điểm thành công cho {count_updated} học sinh!", "success")
+        return redirect(url_for('gv.grading', class_id=class_id))
+
     def get_score(grade_obj, col):
-        return getattr(grade_obj, f"{prefix}_{col}", '') or ''
+        if not grade_obj: return ''
+        val = getattr(grade_obj, f"{prefix}_{col}", None)
+        return val if val is not None else ''
 
     return render_template('gv/grading.html', 
                            classroom=classroom, 
                            students=students, 
-                           subject=subject_name_vn, 
+                           subject=subj_name, 
                            get_score=get_score)
